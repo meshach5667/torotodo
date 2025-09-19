@@ -12,26 +12,58 @@
       theme: {
         extend: {
           colors: {
-            'bg': '#0f172a',
-            'card': '#111827',
-            'text': '#f1f5f9',
-            'muted': '#94a3b8',
-            'accent': '#3b82f6',
-            'accent-hover': '#2563eb',
-            'danger': '#ef4444',
-            'danger-hover': '#dc2626',
-            'border': '#1e293b',
-            'border-light': '#334155',
+            'bg': 'var(--bg)',
+            'card': 'var(--card)',
+            'text': 'var(--text)',
+            'muted': 'var(--muted)',
+            'accent': 'var(--accent)',
+            'accent-hover': 'var(--accent-hover)',
+            'danger': 'var(--danger)',
+            'danger-hover': 'var(--danger-hover)',
+            'border': 'var(--border)',
+            'border-light': 'var(--border-light)',
           }
         }
       }
     }
   </script>
   <style>
+    :root, .light {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --border: #e2e8f0;
+      --border-light: #cbd5e1;
+      --gradient-start: #e0e7ff;
+      --gradient-mid: #f1f5f9;
+      --gradient-end: #dbeafe;
+    }
+    .dark {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --border: #1e293b;
+      --border-light: #334155;
+      --gradient-start: #0b1223;
+      --gradient-mid: #0f172a;
+      --gradient-end: #0a0f1c;
+    }
     body {
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0b1223 0%, #0f172a 50%, #0a0f1c 100%);
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
       min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--text);
     }
     
     @keyframes fadeIn {
@@ -89,6 +121,7 @@
         <div class="flex gap-2 flex-wrap">
           <button class="ghost px-4 py-2 rounded-xl bg-transparent text-muted border border-border-light cursor-pointer transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:border-accent" id="exportBtn" title="Export as JSON">Export</button>
           <button class="ghost px-4 py-2 rounded-xl bg-transparent text-muted border border-border-light cursor-pointer transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:border-accent" id="importBtn" title="Import from JSON">Import</button>
+          <button class="ghost px-4 py-2 rounded-xl bg-transparent text-muted border border-border-light cursor-pointer transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:border-accent" id="themeBtn" title="Toggle theme">Theme</button>
           <input type="file" id="fileInput" accept="application/json" hidden />
         </div>
       </section>
@@ -97,6 +130,28 @@
 
   <script>
     $(document).ready(function() {
+      // --- Theme Switching ------------------------------------------------------
+      const LS_THEME_KEY = "theme.v1";
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      let currentTheme = localStorage.getItem(LS_THEME_KEY) || (prefersDark ? 'dark' : 'light');
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          $('html').removeClass('light').addClass('dark');
+        } else {
+          $('html').removeClass('dark').addClass('light');
+        }
+        localStorage.setItem(LS_THEME_KEY, theme);
+        $("#themeBtn").text(theme === 'dark' ? 'Light Mode' : 'Dark Mode');
+      }
+
+      $("#themeBtn").on('click', function() {
+        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(currentTheme);
+      });
+
+      applyTheme(currentTheme);
+
       // --- Storage & State ------------------------------------------------------
       const LS_KEY = "todos.v1";
       const state = {
